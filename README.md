@@ -228,3 +228,30 @@ el Key es la clave de encriptación de JWT, el Issuer es el nombre del emisor de
 El Issuer es quien emite el token, en este caso la ejecucion del backend 
 El Audience es quien recibe el token, en este caso el frontend 
 La duración del token es de 60 minuto, esto es para que el token no expire y se vuelva a emitir.
+
+
+### Instacion de paquetes
+
+```bash
+
+# Instalar paquetes de NuGet 
+# En dominio no se necesitan paquetes externos 
+# En Application
+cd Application/
+dotnet add Application/Application.csproj package AutoMapper --version 13.0.1
+dotnet add Application/Application.csproj package FluentValidation --version 12.0.0
+dotnet add Application/Application.csproj package MediatR --version 13.0.0
+# En infrastructure
+cd Infrastructure/
+dotnet add Infrastructure/Infrastructure.csproj package Microsoft.EntityFrameworkCore --version 9.0.9
+dotnet add Infrastructure/Infrastructure.csproj package Aspire.Npgsql.EntityFrameworkCore.PostgreSQL --version 9.4.2
+# En api
+cd Api/
+dotnet add Api/Api.csproj package Microsoft.AspNetCore.Authentication.JwtBearer --version 9.0.9
+dotnet add Api/Api.csproj package System.IdentityModel.Tokens.Jwt --version 8.14.0
+dotnet add Api/Api.csproj package AutoMapper --version 13.0.1
+dotnet add Api/Api.csproj package FluentValidation.DependencyInjectionExtensions --version 12.0.0
+dotnet add Api/Api.csproj package Microsoft.AspNetCore.OpenApi --version 9.0.9
+dotnet add Api/Api.csproj package Microsoft.EntityFrameworkCore.Design --version 9.0.9
+dotnet add Api/Api.csproj package Swashbuckle.AspNetCore --version 9.0.5
+```
