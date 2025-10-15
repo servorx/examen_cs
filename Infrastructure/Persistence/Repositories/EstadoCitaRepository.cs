@@ -1,0 +1,69 @@
+using Application.Abstractions;
+using Domain.Entities;
+using Domain.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Persistence.Repositories;
+
+public sealed class EstadoCitaRepository : IEstadoCitaRepository
+{
+    private readonly AppDbContext _context;
+
+    public EstadoCitaRepository(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<EstadoCita?> GetByIdAsync(IdVO id, CancellationToken ct = default)
+    {
+        return await _context.EstadosCita
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
+    }
+
+    public async Task<EstadoCita?> GetByNombreAsync(NombreVO nombre, CancellationToken ct = default)
+    {
+        return await _context.EstadosCita
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Nombre == nombre, ct);
+    }
+
+    public async Task<IReadOnlyList<EstadoCita>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _context.EstadosCita
+            .AsNoTracking()
+            .ToListAsync(ct);
+    }
+
+    public async Task<int> AddAsync(EstadoCita estado, CancellationToken ct = default)
+    {
+        await _context.EstadosCita.AddAsync(estado, ct);
+        return await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<bool> UpdateAsync(EstadoCita estado, CancellationToken ct = default)
+    {
+        var existing = await _context.EstadosCita
+            .FirstOrDefaultAsync(e => e.Id == estado.Id, ct);
+
+        if (existing is null)
+            return false;
+
+        _context.Entry(existing).CurrentValues.SetValues(estado);
+        await _context.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(IdVO id, CancellationToken ct = default)
+    {
+        var existing = await _context.EstadosCita
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
+
+        if (existing is null)
+            return false;
+
+        _context.EstadosCita.Remove(existing);
+        await _context.SaveChangesAsync(ct);
+        return true;
+    }
+}
