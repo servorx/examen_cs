@@ -255,3 +255,23 @@ dotnet add Api/Api.csproj package Microsoft.AspNetCore.OpenApi --version 9.0.9
 dotnet add Api/Api.csproj package Microsoft.EntityFrameworkCore.Design --version 9.0.9
 dotnet add Api/Api.csproj package Swashbuckle.AspNetCore --version 9.0.5
 ```
+
+
+### paso a paso para la feature
+
+1. Crear la entidad en Domain/Entities
+- Definir los VO si es necesario
+2. Crear la configuracion de la entidad en Infrastructure/Persistence/Configurations e instanciarla en el AppDbContext
+Crear la migracion para comprobar que no hayan errores al definir la base de datos
+3. Definir la interfaz del repositorio en Application/Abstractions
+4. Crear el repositorio en Infrastructure/Persistence/Repositories
+5. Crear la interfaz de IUnitOfWork en Application/Abstractions y actualizar el UnitOfWork en Infrastructure/Persistence/UnitOfWork
+7. Definir el DTO en Api/DTOs
+8. definir el mapper en Api/Mappings
+9. Crear la interfaz del servicio en Api en Api/Services/Interfaces
+10. Crear el servicio en Api/Services/Implementations (tener en cuenta JWT)
+11. Crear el controller en Api/Controllers
+12. Actualizar el ApplicationServiceExtensions en Api/Extensions para agregar el servicio, su interfaz 
+13. Crear el seeder si es necesario en Api/Helpers/Seeders y actualizar el Seeder en Api/Extensions/DbSeederExtensions
+14. actualizar el Program y hacer pruebas
+
