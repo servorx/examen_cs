@@ -306,3 +306,4 @@ Crear la migracion para comprobar que no hayan errores al definir la base de dat
 13. Crear el seeder si es necesario en Api/Helpers/Seeders y actualizar el Seeder en Api/Extensions/DbSeederExtensions
 14. actualizar el Program y hacer pruebas
 
+ 
