@@ -256,6 +256,37 @@ dotnet add Api/Api.csproj package Microsoft.EntityFrameworkCore.Design --version
 dotnet add Api/Api.csproj package Swashbuckle.AspNetCore --version 9.0.5
 ```
 
+## comandos Hector
+```bash
+wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+chmod +x dotnet-install.sh
+./dotnet-install.sh --version 9.0.100
+nano ~/.bashrc
+
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$HOME/.dotnet
+source ~/.bashrc
+dotnet ef --version
+dotnet tool install --global dotnet-ef
+export PATH="$PATH:$HOME/.dotnet/tools"
+echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> ~/.bashrc
+source ~/.bashrc
+dotnet ef migrations add IniMig -p Infrastructure/ -s Api/ -o Migrations
+```
+
+luego toca ejecutar el contenedor despues de haber borrado los contenedores
+```bash
+cd docker
+docker ps -a
+docker compose up -d
+```
+
+
+luego toca ejecutar los comandos para poder actualizar los comandos de la migracion desde la raiz del proyecto
+```bash
+dotnet ef database update --project Infrastructure --startup-project Api
+```
+
 
 ### paso a paso para la feature
 
