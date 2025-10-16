@@ -62,6 +62,11 @@ public class OrdenServicioConfig: IEntityTypeConfiguration<OrdenServicio>
             .HasForeignKey(o => o.MecanicoId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasOne(o => o.Recepcionista)
+            .WithMany(m => m.OrdenesServicio)
+            .HasForeignKey(o => o.RecepcionistaId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne(o => o.TipoServicio)
             .WithMany()
             .HasForeignKey(o => o.TipoServicioId);

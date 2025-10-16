@@ -26,6 +26,7 @@ public class UnitOfWork : IUnitOfWork
     private IOrdenServicioRepository? _ordenServicioRepository;
     private IPagoRepository? _pagoRepository;
     private IProveedorRepository? _proveedorRepository;
+    private IRecepcionistaRepository? _recepcionistaRepository;
     private IRepuestoRepository? _repuestoRepository;
     private ITipoMovimientoRepository? _tipoMovimientoRepository;
     private ITipoServicioRepository? _tipoServicioRepository;
@@ -82,6 +83,7 @@ public class UnitOfWork : IUnitOfWork
     public IOrdenServicioRepository OrdenServicio => _ordenServicioRepository ??= new OrdenServicioRepository(_context);
     public IPagoRepository Pagos => _pagoRepository ??= new PagoRepository(_context);
     public IProveedorRepository Proveedores => _proveedorRepository ??= new ProveedorRepository(_context);
+    public IRecepcionistaRepository Recepcionistas => _recepcionistaRepository ??= new RecepcionistaRepository(_context);
     public IRepuestoRepository Repuestos => _repuestoRepository ??= new RepuestoRepository(_context);
     public ITipoMovimientoRepository TipoMovimiento => _tipoMovimientoRepository ??= new TipoMovimientoRepository(_context);
     public ITipoServicioRepository TipoServicio => _tipoServicioRepository ??= new TipoServicioRepository(_context);

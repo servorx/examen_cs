@@ -189,6 +189,9 @@ public static class ApplicationServiceExtensions
             options.AddPolicy("Pro", policy =>
                 policy.RequireRole("Professional"));
 
+            options.AddPolicy("Recep", policy =>
+                policy.RequireRole("Recepcionista"));
+
             // Política que exige claim Subscription = "Premium"
             options.AddPolicy("Professional", policy =>
                 policy.RequireClaim("Subscription", "Premium"));

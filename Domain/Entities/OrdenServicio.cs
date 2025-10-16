@@ -8,6 +8,7 @@ public class OrdenServicio : BaseEntity
     public IdVO VehiculoId { get; set; } = null!;
     public IdVO MecanicoId { get; set; } = null!;
     public IdVO TipoServicioId { get; set; } = null!;
+    public IdVO RecepcionistaId  { get; set; } = null!;
     public IdVO EstadoId { get; set; } = null!;
     public FechaHistoricaVO FechaIngreso { get; set; } = null!;
     public FechaHistoricaVO FechaEntregaEstimada { get; set; } = null!;
@@ -17,17 +18,19 @@ public class OrdenServicio : BaseEntity
     public Mecanico Mecanico { get; set; } = null!;
     public TipoServicio TipoServicio { get; set; } = null!;
     public EstadoOrden Estado { get; set; } = null!;
+    public Recepcionista Recepcionista { get; set; } = null!;
 
     public ICollection<DetalleOrden> Detalles { get; set; } = new List<DetalleOrden>();
     public ICollection<Factura> Facturas { get; set; } = new List<Factura>();
 
     // constructores
     public OrdenServicio() { }
-    public OrdenServicio(IdVO id, Vehiculo vehiculo, Mecanico mecanico, TipoServicio tipoServicio, EstadoOrden estado, FechaHistoricaVO fechaIngreso, FechaHistoricaVO fechaEntregaEstimada)
+    public OrdenServicio(IdVO id, Vehiculo vehiculo, Mecanico mecanico,  Recepcionista recepcionista, TipoServicio tipoServicio, EstadoOrden estado, FechaHistoricaVO fechaIngreso, FechaHistoricaVO fechaEntregaEstimada)
     {
         Id = id;
         Vehiculo = vehiculo;
         Mecanico = mecanico;
+        Recepcionista = recepcionista;
         TipoServicio = tipoServicio;
         Estado = estado;
         FechaIngreso = fechaIngreso;

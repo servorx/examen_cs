@@ -20,6 +20,7 @@ public interface IUnitOfWork
     IOrdenServicioRepository OrdenServicio { get; }
     IPagoRepository Pagos { get; }
     IProveedorRepository Proveedores { get; }
+    IRecepcionistaRepository Recepcionistas { get; }
     IRepuestoRepository Repuestos { get; }
     ITipoMovimientoRepository TipoMovimiento { get; }
     ITipoServicioRepository TipoServicio { get; }

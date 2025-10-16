@@ -306,4 +306,78 @@ Crear la migracion para comprobar que no hayan errores al definir la base de dat
 13. Crear el seeder si es necesario en Api/Helpers/Seeders y actualizar el Seeder en Api/Extensions/DbSeederExtensions
 14. actualizar el Program y hacer pruebas
 
- 
+
+
+
+El objetivo es configurar y aplicar Rate Limiting en la API para modular el tráfico según el rol JWT del usuario y el tipo de ruta:
+
+    Roles: Admin y Recepcionista (claims en el token JWT).
+    Rutas de escritura (sensibles): POST/PUT/DELETE de
+    /api/ordenesservicio
+    /api/repuestos
+     Estas deben tener cuotas más estrictas para Recepcionista y más laxas para Admin.
+    Rutas de lectura (GET): compartir un umbral común (independiente del rol) para mantener la experiencia de consulta.
+
+Se debe particionar el limitador primero por rol (claim role/roles); si no se encuentra el claim (token inválido o anónimo), se debe caer a la IP remota como clave de partición. La respuesta de rechazo (429 Too Many Requests) debe ser JSON uniforme, con un mensaje claro y, opcionalmente, un campo de diagnóstico mínimo (sin filtrar datos sensibles).
+
+
+Objetivo general
+
+Proteger la API ante abusos y picos de tráfico ajustando límites por perfil de riesgo (rol) y criticidad (escrituras vs. lecturas), sin degradar la usabilidad en consultas de lectura.
+Objetivos específicos
+
+    Particionar Rate Limiting por claim de rol (Admin/Recepcionista). Si el claim no está presente, fallback a IP.
+    Aplicar una política estricta para Recepcionista y una más permisiva para Admin en POST/PUT/DELETE de /api/ordenesservicio y /api/repuestos.
+    Mantener un límite común para GET (independiente del rol).
+    Unificar la respuesta 429 con payload JSON consistente (mensaje + timestamp, por ejemplo).
+    Incluir pruebas rápidas (.http o Swagger) con dos tokens (Admin y Recepcionista).
+
+Alcance funcional (mínimo)
+
+    Políticas de Rate Limiting:
+    readCommon: para GET de la API pública/privada (umbral compartido).
+    writeByRole: dinámica según rol:
+    Recepcionista: límite estricto (p. ej., 5/minuto).
+    Admin: límite laxo (p. ej., 20/minuto).
+    Particionado:
+    Clave primaria = rol si existe (Admin/Recepcionista).
+    Clave secundaria (fallback) = IP si no hay claim (token ausente/dañado).
+    Ámbito:
+    Se aplicará writeByRole a:
+    POST/PUT/DELETE /api/ordenesservicio
+    POST/PUT/DELETE /api/repuestos
+    Se aplicará readCommon a:
+    GET /api/** (o al menos a los módulos de órdenes y repuestos).
+
+
+Requerimientos de entrega
+
+1. La solucion del examen debe estar publicada en el repositorio original del proyecto entregado en la iteración de proyecto.
+
+
+2. Se debe crear una rama adicional en el proyecto donde se debe encontrar la solucion planteada. La rama debe llamarse slnExamen.
+
+
+3. No se permitiran entregas posteriores a la fecha estipulada.
+
+
+4. Los commits deben cumplir con el standard conventional commit.
+
+
+5. La rama de la solucion debe tener documento README donde se evidence proceso y requerimientos
+
+de ejecucion de la solución.
+
+
+6. El documento README debe contener las pruebas realizadas de la solución. Las pruebas deben tener datos reales de acuerdo a la base de datos.
+
+Resultado esperado
+
+Resultados esperados
+
+    Con token Recepcionista, al disparar varias escrituras seguidas en /api/ordenesservicio o /api/repuestos, se alcanza rápidamente 429 con el JSON uniforme.
+    Con token Admin, el umbral de escrituras es mayor (tarda más en llegar a 429).
+    Las lecturas (GET) presentan un umbral común y se comportan igual para ambos roles (o usuarios sin rol, si GET requiere auth).
+    Usuarios sin claim de rol (o token inválido) caen al fallback por IP; siguen limitados correctamente.
+
+

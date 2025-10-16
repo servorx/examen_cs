@@ -34,6 +34,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<Administrador> Administradores => Set<Administrador>();
     public DbSet<Mecanico> Mecanicos => Set<Mecanico>();
     public DbSet<Proveedor> Proveedores => Set<Proveedor>();
+    public DbSet<Recepcionista> Recepcionistas => Set<Recepcionista>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

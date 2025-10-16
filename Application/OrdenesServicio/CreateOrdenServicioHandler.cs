@@ -20,6 +20,7 @@ public class CreateOrdenServicioHandler : IRequestHandler<CreateOrdenServicio, I
             id: IdVO.CreateNew(),
             vehiculo: new Vehiculo { Id = request.VehiculoId }, // solo el Id necesario
             mecanico: new Mecanico { Id = request.MecanicoId },
+            recepcionista: new Recepcionista { Id = request.RecepcionistaId },
             tipoServicio: new TipoServicio { Id = request.TipoServicioId },
             estado: new EstadoOrden { Id = request.EstadoId },
             fechaIngreso: request.FechaIngreso,

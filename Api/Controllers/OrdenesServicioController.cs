@@ -70,6 +70,7 @@ public class OrdenesServicioController : BaseApiController
             IdVO.CreateNew(),
             new Vehiculo { Id = new IdVO(dto.VehiculoId) },
             new Mecanico { Id = new IdVO(dto.MecanicoId) },
+            new Recepcionista { Id = new IdVO(dto.RecepcionistaId) },
             new TipoServicio { Id = new IdVO(dto.TipoServicioId) },
             new EstadoOrden { Id = new IdVO(dto.EstadoId) },
             new FechaHistoricaVO(dto.FechaIngreso),

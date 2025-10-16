@@ -31,6 +31,7 @@ public static class UsersSeeder
         AddIfNotExists("cliente1", "cliente@correo.com", "cliente123");
         AddIfNotExists("mecanico1", "mecanico@correo.com", "mecanico123");
         AddIfNotExists("proveedor1", "proveedor@correo.com", "proveedor123");
+        AddIfNotExists("recepcionista1", "recepcionista@coreo.com", "recepcionista123");
 
         if (users.Count > 0)
         {

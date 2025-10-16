@@ -9,7 +9,8 @@ public class UserAuthorization
         Administrador,
         Cliente,
         Mecanico,
-        Proveedor
+        Proveedor,
+        Recepcionista
     }
 
     public const Roles rol_default = Roles.Cliente;
