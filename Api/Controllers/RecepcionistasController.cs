@@ -118,7 +118,7 @@ public class RecepcionistasController : BaseApiController
         // Map parcial con value objects
         if (body.Nombre != null) existing.Nombre = new NombreVO(body.Nombre);
         if (body.Telefono != null) existing.Telefono = new TelefonoVO(body.Telefono);
-        if (body.AniosExperiencia != null) existing.AnioExperiencia = new AnioExperienciaVO(body.AniosExperiencia);
+        if (body.AniosExperiencia != null) existing.AnioExperiencia = new AnioExperienciaVO(body.AniosExperiencia.Value);
         if (body.IsActive.HasValue) existing.IsActive = new EstadoVO(body.IsActive.Value);
 
         try

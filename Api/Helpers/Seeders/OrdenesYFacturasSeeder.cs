@@ -13,16 +13,18 @@ public static class OrdenesYFacturasSeeder
 
         var vehiculo = await db.Vehiculos.FirstOrDefaultAsync();
         var mecanico = await db.Mecanicos.FirstOrDefaultAsync();
+        var recepcionista = await db.Recepcionistas.FirstOrDefaultAsync();
         var tipoServicio = await db.TiposServicio.FirstOrDefaultAsync();
         var estadoOrden = await db.EstadosOrden.FirstOrDefaultAsync();
 
-        if (vehiculo == null || mecanico == null || tipoServicio == null || estadoOrden == null) return;
+        if (vehiculo == null || mecanico == null || tipoServicio == null || estadoOrden == null || recepcionista == null) return;
 
         var orden = new OrdenServicio
         {
             VehiculoId = vehiculo.Id,
             MecanicoId = mecanico.Id,
             TipoServicioId = tipoServicio.Id,
+            RecepcionistaId = recepcionista.Id,
             EstadoId = estadoOrden.Id,
             FechaIngreso = new FechaHistoricaVO(DateTime.UtcNow),
             FechaEntregaEstimada = new FechaHistoricaVO(DateTime.UtcNow.AddDays(2))

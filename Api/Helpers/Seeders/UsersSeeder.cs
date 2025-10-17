@@ -6,7 +6,7 @@ namespace Api.Helpers.Seeders;
 
 public static class UsersSeeder
 {
-    public static async Task SeedBaseUsersAsync(AppDbContext db)
+    public static async Task SeedAsync(AppDbContext db)
     {
         var existingUsernames = await db.UsersMembers
             .Select(u => u.Username)

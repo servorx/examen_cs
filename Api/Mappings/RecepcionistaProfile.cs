@@ -44,7 +44,7 @@ public sealed class RecepcionistaProfile : Profile
         {
             if (src.Nombre != null) dest.Nombre = new NombreVO(src.Nombre);
             if (src.Telefono != null) dest.Telefono = new TelefonoVO(src.Telefono);
-            if (src.AniosExperiencia != null) dest.AnioExperiencia = new AnioExperienciaVO(src.AniosExperiencia);
+            if (src.AniosExperiencia != null) dest.AnioExperiencia = new AnioExperienciaVO(src.AniosExperiencia.Value);
             if (src.IsActive.HasValue) dest.IsActive = new EstadoVO(src.IsActive.Value);
         });
     }

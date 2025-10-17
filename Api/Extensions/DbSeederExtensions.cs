@@ -16,7 +16,7 @@ public static class DbSeederExtensions
         await db.Database.MigrateAsync();
 
         await RolesSeeder.SeedAsync(db);
-        await UsersSeeder.SeedBaseUsersAsync(db);
+        await UsersSeeder.SeedAsync(db);
         await ExtendedUsersSeeder.SeedAsync(db);
         await UserRolesSeeder.SeedAsync(db);
         await CatalogsSeeder.SeedAsync(db);

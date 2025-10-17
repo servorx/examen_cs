@@ -16,6 +16,8 @@ using Api.Services.Implementations;
 using Api.Services.Interfaces;
 using Api.Services.Interfaces.Auth;
 using Api.Services.Implementations.Auth;
+using System.Security.Claims;
+using System.Text.Json;
 namespace Api.Extensions;
 
 // este archivo define ciertos metodos de extensión para la aplicación, como CORS, JWT, servicios de aplicacion, RateLimiter, errores de validación, etc...
@@ -74,6 +76,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IOrdenServicioService, OrdenServicioService>();
         services.AddScoped<IPagoService, PagoService>();
         services.AddScoped<IProveedorService, ProveedorService>();
+        services.AddScoped<IRecepcionistaService, RecepcionistaService>();
         services.AddScoped<IRepuestoService, RepuestoService>();
         services.AddScoped<ITipoServicioService, TipoServicioService>();
         services.AddScoped<ITipoMovimientoService, TipoMovimientoService>();
@@ -90,6 +93,7 @@ public static class ApplicationServiceExtensions
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
     // este es el meetodo para agregar el RateLimiter 
+    // recibe la collecion de servicios y agrega el RateLimiter a ella
     public static IServiceCollection AddCustomRateLimiter(this IServiceCollection services)
     {
         services.AddRateLimiter(options =>
@@ -115,36 +119,95 @@ public static class ApplicationServiceExtensions
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst
                 });
             });
-            // Fixed Window Limiter
-            // options.AddFixedWindowLimiter("fixed", opt =>
-            // {
-            //     opt.Window = TimeSpan.FromSeconds(10);
-            //     opt.PermitLimit = 5;
-            //     opt.QueueLimit = 0;
-            //     opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-            // });
+            // OnRejected es llamado cuando se rechaza una solicitud como callback para que cuando una peticion sea erronea por exceso de peticiones
+            options.OnRejected = async (context, token) =>
+            {
+                // IP de la solicitud, si no está disponible se usa desconocida
+                var ip = context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "desconocida";
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.HttpContext.Response.ContentType = "application/json";
+                // JSON con el mensaje de error y la IP
+                var payload = new
+                {
+                    message = "Demasiadas solicitudes. Intenta más tarde.",
+                    ip = ip,
+                    timestamp = DateTime.UtcNow.ToString("o")
+                };
 
-            // Sliding Window Limiter
-            // options.AddSlidingWindowLimiter("sliding", opt =>
-            // {
-            //     opt.Window = TimeSpan.FromSeconds(10);
-            //     opt.SegmentsPerWindow = 3;
-            //     opt.PermitLimit = 6;
-            //     opt.QueueLimit = 0;
-            //     opt.QueueProcessingOrder = QueueProcessingOrder.NewestFirst;
-            //     // Aquí se personaliza la respuesta cuando se excede el límite
-            // });
+                await context.HttpContext.Response.WriteAsync(JsonSerializer.Serialize(payload), token);
+            };
 
-            // Token Bucket Limiter
-            // options.AddTokenBucketLimiter("token", opt =>
-            // {
-            //     opt.TokenLimit = 20;
-            //     opt.TokensPerPeriod = 4;
-            //     opt.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
-            //     opt.QueueLimit = 2;
-            //     opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-            //     opt.AutoReplenishment = true;
-            // });
+            // politica comun de lectura sin importar los roles 
+            options.AddPolicy("readCommon", httpContext =>
+            {
+                // cada ip puede contar como una ventada de 100 peticiones por minuto
+                var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                // esto es para que el rate limiter sea dinamico de acuerdo al IP
+                // fixed window es un rate limiter que limita la cantidad de peticiones por IP y recibe los parametos de PermitLimit, Window, QueueLimit y QueueProcessingOrder
+                return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 100, // 100 GETs por minuto, por ventana
+                    Window = TimeSpan.FromMinutes(1),
+                    // no se colocan peticiones cuando no hay tokens, son rechazados de inmediato
+                    QueueLimit = 0,
+                    // procesa las ordenes de acuerdo a su antiguedad 
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                });
+            });
+
+            // politica dinamica de escritura segun el rol del usuario
+            options.AddPolicy("writeByRole", httpContext =>
+            {
+                // lee el rol del usuario que intenta hacer la peticion
+                var user = httpContext.User;
+                string? role = user.FindFirst("role")?.Value ?? user.FindFirst(ClaimTypes.Role)?.Value;
+
+                // Clave de partición = rol o IP (fallback)
+                var partitionKey = role ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown-ip";
+                // token bucket es un rate limiter que limita la cantidad de peticiones por IP y recibe los parametos de TokenLimit, TokensPerPeriod, ReplenishmentPeriod, QueueLimit y QueueProcessingOrder, pero esta vez es mucho mas completo porque lo define de acuerdo al rol del usuario
+                return RateLimitPartition.GetTokenBucketLimiter(partitionKey, _ =>
+                {
+                    if (role == "Administrador")
+                    {
+                        // admin, es mucho mas permisivo
+                        return new TokenBucketRateLimiterOptions
+                        {
+                            TokenLimit = 20,
+                            TokensPerPeriod = 20,
+                            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            AutoReplenishment = true
+                        };
+                    }
+                    else if (role == "Recepcionista")
+                    {
+                        // con recepcionista es mas estricto
+                        return new TokenBucketRateLimiterOptions
+                        {
+                            TokenLimit = 5,
+                            TokensPerPeriod = 5,
+                            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            AutoReplenishment = true
+                        };
+                    }
+                    else
+                    {
+                        // fallback es anonimo o sin rol
+                        return new TokenBucketRateLimiterOptions
+                        {
+                            TokenLimit = 5,
+                            TokensPerPeriod = 5,
+                            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            AutoReplenishment = true
+                        };
+                    }
+                });
+            });
         });
         return services;
     }

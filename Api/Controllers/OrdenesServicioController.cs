@@ -5,6 +5,7 @@ using Domain.Entities;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Api.Controllers;
 
@@ -22,6 +23,7 @@ public class OrdenesServicioController : BaseApiController
 
     // GET: api/OrdenServicio/all
     [HttpGet("all")]
+    [EnableRateLimiting("readCommon")]
     public async Task<ActionResult<IEnumerable<OrdenServicioDto>>> GetAllAsync(CancellationToken ct)
     {
         var ordenes = await _service.GetAllAsync(ct);
@@ -31,6 +33,7 @@ public class OrdenesServicioController : BaseApiController
 
     // GET: api/OrdenServicio/{id}
     [HttpGet("{id:int}")]
+    [EnableRateLimiting("readCommon")]
     public async Task<ActionResult<OrdenServicioDetailDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var orden = await _service.GetByIdAsync(new IdVO(id), ct);
@@ -43,6 +46,7 @@ public class OrdenesServicioController : BaseApiController
 
     // GET: api/OrdenServicio/vehiculo/{vehiculoId}
     [HttpGet("vehiculo/{vehiculoId:int}")]
+    [EnableRateLimiting("readCommon")]
     public async Task<ActionResult<IEnumerable<OrdenServicioDto>>> GetByVehiculoAsync(int vehiculoId, CancellationToken ct)
     {
         var ordenes = await _service.GetByVehiculoAsync(new IdVO(vehiculoId), ct);
@@ -52,6 +56,7 @@ public class OrdenesServicioController : BaseApiController
 
     // GET: api/OrdenServicio/mecanico/{mecanicoId}
     [HttpGet("mecanico/{mecanicoId:int}")]
+    [EnableRateLimiting("readCommon")]
     public async Task<ActionResult<IEnumerable<OrdenServicioDto>>> GetByMecanicoAsync(int mecanicoId, CancellationToken ct)
     {
         var ordenes = await _service.GetByMecanicoAsync(new IdVO(mecanicoId), ct);
@@ -61,6 +66,7 @@ public class OrdenesServicioController : BaseApiController
 
     // POST: api/OrdenServicio
     [HttpPost]
+    [EnableRateLimiting("writeByRole")]
     public async Task<ActionResult<OrdenServicioDto>> CreateAsync([FromBody] CreateOrdenServicioDto dto, CancellationToken ct)
     {
         if (dto is null)
@@ -92,6 +98,7 @@ public class OrdenesServicioController : BaseApiController
 
     //PUT: api/OrdenServicio/{id}
     [HttpPut("{id:int}")]
+    [EnableRateLimiting("writeByRole")]
     public async Task<ActionResult> UpdateAsync(int id, [FromBody] UpdateOrdenServicioDto dto, CancellationToken ct)
     {
         if (dto is null)
@@ -124,6 +131,7 @@ public class OrdenesServicioController : BaseApiController
 
     // DELETE: api/OrdenServicio/{id}
     [HttpDelete("{id:int}")]
+    [EnableRateLimiting("writeByRole")]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct)
     {
         var deleted = await _service.DeleteAsync(new IdVO(id), ct);

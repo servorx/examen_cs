@@ -3,6 +3,6 @@ namespace Api.DTOs.Recepcionistas;
 public sealed record UpdateRecepcionistaDto(
     string? Nombre,
     string? Telefono,
-    int AniosExperiencia,
+    int? AniosExperiencia,
     bool? IsActive
 );

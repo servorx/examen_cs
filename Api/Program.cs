@@ -106,9 +106,9 @@ app.Use(async (context, next) =>
     }
 });
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJob2xhIiwianRpIjoiNDNlYjUyNzAtYTE2Mi00MjFjLTkwMjgtNzQ0NTZlMGQ0Njk3IiwiZW1haWwiOiJzZXJ2b3IxMjNAZ21haWwuY29tIiwidWlkIjoiOCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkNsaWVudGUiLCJleHAiOjE3NjA0NDY1NDYsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo1MDAxIn0.Mf2y-L79XAwc1ZFK1QIs0vbCeczzqyi1Px6rZue2jDY

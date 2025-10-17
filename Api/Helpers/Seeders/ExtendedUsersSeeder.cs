@@ -82,6 +82,23 @@ public static class ExtendedUsersSeeder
             }
         }
 
+        // Recepcionistas
+        if (!await db.Recepcionistas.AnyAsync())
+        {
+            var recepUser = users.FirstOrDefault(u => u.Username == "recepcionista1");
+            if (recepUser != null)
+            {
+                db.Recepcionistas.Add(new Recepcionista
+                {
+                    Nombre = new NombreVO("Pedro Pérez"),
+                    Telefono = new TelefonoVO("3051234567"),
+                    AnioExperiencia = new AnioExperienciaVO(10),
+                    UserId = recepUser.Id,
+                    IsActive = new EstadoVO(true)
+                });
+            }
+        }
+
         await db.SaveChangesAsync();
     }
 }
